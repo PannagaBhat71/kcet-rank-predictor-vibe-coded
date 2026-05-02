@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KCET 2026 Rank Predictor</title>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent: #38bdf8;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --input-bg: #0f172a;
+            --border: #334155;
+            --warning: #fbbf24;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+        }
+
+        h1 {
+            color: var(--accent);
+            text-align: center;
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 1.5rem 0 1rem;
+            font-weight: 600;
+            color: #f472b6;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-header::after {
+            content: "";
+            height: 1px;
+            flex-grow: 1;
+            background: var(--border);
+        }
+
+        .grid-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        input {
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 12px;
+            color: white;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        button {
+            width: 100%;
+            margin-top: 2rem;
+            padding: 14px;
+            background: linear-gradient(135deg, #38bdf8 0%, #2563eb 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        .result-panel {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #020617;
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            display: none;
+            text-align: center;
+        }
+
+        .rank-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+
+        .disclaimer {
+            margin-top: 2rem;
+            padding: 1rem;
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px dashed var(--warning);
+            border-radius: 8px;
+            font-size: 0.75rem;
+            color: var(--warning);
+            line-height: 1.5;
+            text-align: center;
+        }
+
+        .disclaimer b {
+            display: block;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>KCET 2026 Predictor</h1>
+        <p class="subtitle">Mid-Tough Difficulty • 3.3L Applicants</p>
+
+        <div class="section-header">Board Marks (Out of 100)</div>
+        <div class="grid-inputs">
+            <div class="field">
+                <label>Maths</label>
+                <input type="number" id="bm" min="0" max="100" placeholder="0">
+            </div>
+            <div class="field">
+                <label>Physics</label>
+                <input type="number" id="bp" min="0" max="100" placeholder="0">
+            </div>
+            <div class="field">
+                <label>Chemistry</label>
+                <input type="number" id="bc" min="0" max="100" placeholder="0">
+            </div>
+        </div>
+
+        <div class="section-header">KCET Marks (Out of 60)</div>
+        <div class="grid-inputs">
+            <div class="field">
+                <label>Maths</label>
+                <input type="number" id="km" min="0" max="60" placeholder="0">
+            </div>
+            <div class="field">
+                <label>Physics</label>
+                <input type="number" id="kp" min="0" max="60" placeholder="0">
+            </div>
+            <div class="field">
+                <label>Chemistry</label>
+                <input type="number" id="kc" min="0" max="60" placeholder="0">
+            </div>
+        </div>
+
+        <button onclick="runPredictor()">Calculate Rank</button>
+
+        <div id="result" class="result-panel">
+            <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 5px;">Estimated Rank</div>
+            <div id="rankValue" class="rank-value">--</div>
+            <div id="aggValue" style="font-size: 0.9rem; margin-top: 10px; color: var(--text-secondary);">Aggregate: --%</div>
+        </div>
+
+        <div class="disclaimer">
+            <b>Disclaimer</b>
+            This is a prediction based on 2025 trends and assumed difficulty levels for 2026. Final ranks depend on KEA's official normalization and actual student performance. <b>Do not take this rank seriously or as an official result.</b>
+        </div>
+    </div>
+
+    <script>
+        function runPredictor() {
+            const bm = parseFloat(document.getElementById('bm').value) || 0;
+            const bp = parseFloat(document.getElementById('bp').value) || 0;
+            const bc = parseFloat(document.getElementById('bc').value) || 0;
+            const km = parseFloat(document.getElementById('km').value) || 0;
+            const kp = parseFloat(document.getElementById('kp').value) || 0;
+            const kc = parseFloat(document.getElementById('kc').value) || 0;
+
+            const boardAvg = ((bm + bp + bc) / 300) * 100;
+            const kcetAvg = ((km + kp + kc) / 180) * 100;
+            const aggregate = (boardAvg + kcetAvg) / 2;
+
+            let predictedRank = 0;
+            
+            if (aggregate >= 96) predictedRank = 80;
+            else if (aggregate >= 90) predictedRank = 1100 + (90.5 - aggregate) * 450;
+            else if (aggregate >= 80) predictedRank = 8600 + (80.1 - aggregate) * 1100;
+            else if (aggregate >= 70) predictedRank = 30000 + (70 - aggregate) * 1800;
+            else predictedRank = 40000 + (67 - aggregate) * 2500;
+
+            predictedRank += 1000; 
+            predictedRank *= 0.98;
+
+            if (km > 50) predictedRank -= 200;
+            else if (km > 40) predictedRank -= 100;
+
+            const resultBox = document.getElementById('result');
+            resultBox.style.display = 'block';
+            document.getElementById('rankValue').innerText = Math.round(Math.max(1, predictedRank)).toLocaleString();
+            document.getElementById('aggValue').innerText = "Composite Aggregate: " + aggregate.toFixed(2) + "%";
+        }
+    </script>
+</body>
+</html>
